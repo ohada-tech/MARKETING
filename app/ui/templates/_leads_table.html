@@ -14,7 +14,7 @@
         <a href="/leads/{{ lead.id }}"><strong>{{ lead.company }}</strong></a>
         <div class="muted">{{ label(labels.SEGMENT, lead.segment) }}{% if lead.city %} · {{ lead.city }}{% endif %}</div>
       </td>
-      <td class="angle" data-label="זווית">{{ lead.angle or "" }}</td>
+      <td class="angle" data-label="זווית"><span dir="auto">{{ lead.angle or "" }}</span></td>
       <td data-label="סטטוס">
         <span class="pill {% if lead.status == 'suppressed' %}danger{% endif %}">{{ label(labels.STATUS, lead.status) }}</span>
         {% if lead.id in profiled %}<span class="pill">פרופיל</span>{% endif %}

@@ -27,7 +27,7 @@
 <div class="grid">
   <section class="card">
     <h2 style="margin-top:0">הזווית</h2>
-    <p>{{ lead.angle or "אין זווית עדיין" }}</p>
+    <p dir="auto">{{ lead.angle or "אין זווית עדיין" }}</p>
     {% if lead.evidence_url %}
       <p>ראיה: <a href="{{ lead.evidence_url }}" target="_blank" rel="noopener noreferrer">{{ lead.evidence_type or "קישור" }}</a></p>
     {% endif %}
