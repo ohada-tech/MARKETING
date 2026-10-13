@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}פנייה ללקוחות{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #f6f5f2; --surface: #ffffff; --text: #1d1d1b; --muted: #6b6a66; --border: #e3e1dc;
+      --accent: #2f5d50; --accent-soft: #e4efe9; --warn: #8a5a00; --warn-soft: #fbf0d9;
+      --danger: #9b2c2c; --danger-soft: #f8e1e1;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #161615; --surface: #1f1f1d; --text: #ecebe7; --muted: #a3a19b; --border: #34332f;
+        --accent: #8cc7b2; --accent-soft: #233630; --warn: #e8b85a; --warn-soft: #3a2f17;
+        --danger: #f09a9a; --danger-soft: #3d2121;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+    a { color: var(--accent); }
+    header.top { display: flex; gap: 16px; align-items: center; padding: 12px 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border); }
+    header.top strong { font-size: 17px; }
+    header.top nav a { text-decoration: none; margin-inline-start: 12px; }
+    .badge-dry { margin-inline-start: auto; font-size: 13px; padding: 2px 10px; border-radius: 99px;
+      background: var(--warn-soft); color: var(--warn); }
+    main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 22px; margin: 4px 0 12px; }
+    h2 { font-size: 18px; margin: 24px 0 8px; }
+    .muted { color: var(--muted); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .pill { display: inline-block; font-size: 13px; padding: 1px 9px; border-radius: 99px;
+      background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+    .pill.warn { background: var(--warn-soft); color: var(--warn); }
+    .pill.danger { background: var(--danger-soft); color: var(--danger); }
+    .ltr { direction: ltr; unicode-bidi: isolate; }
+    pre.body { white-space: pre-wrap; word-break: break-word; font: inherit; margin: 8px 0 0;
+      background: var(--bg); padding: 12px; border-radius: 8px; }
+  </style>
+  <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <strong>פנייה ללקוחות</strong>
+    <nav><a href="/leads">לידים</a></nav>
+    <span class="badge-dry" title="אין שליחה בשלב הזה">קריאה בלבד</span>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>

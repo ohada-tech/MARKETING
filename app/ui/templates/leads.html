@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}לידים{% endblock %}
+{% block content %}
+<style>
+  form.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  form.filters label { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); gap: 2px; }
+  form.filters input, form.filters select { font: inherit; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--surface); color: var(--text); min-width: 0; }
+  table.leads { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  table.leads th, table.leads td { text-align: start; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.leads th { font-size: 13px; color: var(--muted); font-weight: 600; }
+  table.leads tr:last-child td { border-bottom: 0; }
+  td.score { font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.angle { max-width: 380px; }
+  @media (max-width: 720px) {
+    table.leads thead { display: none; }
+    table.leads, table.leads tbody, table.leads tr, table.leads td { display: block; width: 100%; }
+    table.leads tr { border-bottom: 1px solid var(--border); padding: 8px 0; }
+    table.leads td { border: 0; padding: 3px 12px; }
+    table.leads td[data-label]::before { content: attr(data-label) ": "; color: var(--muted); font-size: 13px; }
+    td.angle { max-width: none; }
+  }
+</style>
+<h1>לידים</h1>
+<form class="filters" method="get" action="/leads"
+      hx-get="/leads" hx-target="#leads-table" hx-push-url="true" hx-trigger="change, keyup changed delay:300ms from:input[name=q]">
+  <label>חיפוש
+    <input type="search" name="q" value="{{ filters.q }}" placeholder="שם עסק">
+  </label>
+  <label>סטטוס
+    <select name="status">
+      <option value="">הכל</option>
+      {% for s in statuses %}<option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ label(labels.STATUS, s) }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>ורטיקל
+    <select name="segment">
+      <option value="">הכל</option>
+      {% for s in segments %}<option value="{{ s }}" {% if filters.segment == s %}selected{% endif %}>{{ label(labels.SEGMENT, s) }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>מסלול
+    <select name="route">
+      <option value="">הכל</option>
+      {% for r in routes %}<option value="{{ r }}" {% if filters.route == r %}selected{% endif %}>{{ label(labels.LEGAL_ROUTE, r) }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>ציון מינימלי
+    <input type="number" name="min_score" min="0" max="100" value="{{ filters.min_score }}">
+  </label>
+  <noscript><button type="submit">סנן</button></noscript>
+</form>
+<div id="leads-table">{% include "_leads_table.html" %}</div>
+{% endblock %}

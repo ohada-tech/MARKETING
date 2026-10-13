@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.company }}{% endblock %}
+{% block content %}
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
+  dl.facts dt { color: var(--muted); font-size: 14px; }
+  dl.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .draft { margin-bottom: 12px; }
+  .draft header { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .draft .subject { margin-top: 8px; }
+  ul.tight { margin: 4px 0; padding-inline-start: 20px; }
+  table.mini { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.mini td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+  .callout { border-inline-start: 3px solid var(--warn); padding: 8px 12px; background: var(--warn-soft); border-radius: 6px; }
+</style>
+
+<p><a href="/leads">חזרה ללידים</a></p>
+<h1>{{ lead.company }}</h1>
+<p>
+  <span class="pill {% if lead.status == 'suppressed' %}danger{% endif %}">{{ label(labels.STATUS, lead.status) }}</span>
+  {% if lead.score is not none %}<span class="pill">ציון {{ lead.score }}</span>{% endif %}
+  {% if lead.legal_route %}<span class="pill">{{ label(labels.LEGAL_ROUTE, lead.legal_route) }}</span>{% endif %}
+  {% if lead.suggested_package %}<span class="pill">{{ lead.suggested_package }}</span>{% endif %}
+</p>
+
+<div class="grid">
+  <section class="card">
+    <h2 style="margin-top:0">הזווית</h2>
+    <p>{{ lead.angle or "אין זווית עדיין" }}</p>
+    {% if lead.evidence_url %}
+      <p>ראיה: <a href="{{ lead.evidence_url }}" target="_blank" rel="noopener noreferrer">{{ lead.evidence_type or "קישור" }}</a></p>
+    {% endif %}
+  </section>
+  <section class="card">
+    <h2 style="margin-top:0">פרטים</h2>
+    <dl class="facts">
+      {% if lead.segment %}<dt>ורטיקל</dt><dd>{{ label(labels.SEGMENT, lead.segment) }}</dd>{% endif %}
+      {% if lead.city or lead.region %}<dt>מיקום</dt><dd>{{ lead.city or "" }}{% if lead.city and lead.region %}, {% endif %}{{ lead.region or "" }}</dd>{% endif %}
+      {% if lead.website %}<dt>אתר</dt><dd><a class="ltr" href="{{ lead.website }}" target="_blank" rel="noopener noreferrer">{{ lead.website }}</a></dd>{% endif %}
+      {% if lead.instagram %}<dt>אינסטגרם</dt><dd class="ltr">{{ lead.instagram }}</dd>{% endif %}
+      {% if lead.facebook_page %}<dt>פייסבוק</dt><dd class="ltr">{{ lead.facebook_page }}</dd>{% endif %}
+      {% if lead.source_channel %}<dt>נמצא דרך</dt><dd>{{ lead.source_channel }}</dd>{% endif %}
+      {% if lead.date_found %}<dt>תאריך</dt><dd>{{ lead.date_found }}</dd>{% endif %}
+      {% if lead.source_file %}<dt>קובץ מקור</dt><dd class="ltr">{{ lead.source_file }}</dd>{% endif %}
+    </dl>
+  </section>
+  <section class="card">
+    <h2 style="margin-top:0">אנשי קשר</h2>
+    {% for c in contacts %}
+      <dl class="facts" style="margin-bottom:8px">
+        {% if c.name %}<dt>שם</dt><dd>{{ c.name }}{% if c.role %} · {{ c.role }}{% endif %}</dd>{% endif %}
+        {% if c.email %}<dt>מייל</dt><dd class="ltr">{{ c.email }}</dd>{% endif %}
+        {% if c.phone %}<dt>טלפון</dt><dd class="ltr">{{ c.phone }}</dd>{% endif %}
+        {% if c.whatsapp %}<dt>וואטסאפ</dt><dd class="ltr">{{ c.whatsapp }}</dd>{% endif %}
+      </dl>
+      {% if c.needs_manual %}<span class="pill warn">דורש בדיקה ידנית</span>{% endif %}
+      {% if c.is_mobile_only %}<span class="pill warn">נייד בלבד: בדיקת "אל תתקשרו אליי" לפני חיוג</span>{% endif %}
+    {% else %}
+      <p class="muted">אין פרטי קשר</p>
+    {% endfor %}
+  </section>
+</div>
+
+{% if lead.signal_notes %}
+<h2>הערות סימן וניקוד</h2>
+<div class="card">
+  <p style="margin-top:0" dir="auto">{{ lead.signal_notes }}</p>
+  {% if lead.score_breakdown %}
+    <p class="muted" style="margin-bottom:0">פירוק ציון:
+      {% for k, v in lead.score_breakdown.items() %}<span class="pill">{{ k }} {{ v }}</span> {% endfor %}
+    </p>
+  {% endif %}
+</div>
+{% endif %}
+
+<h2>טיוטות</h2>
+{% for d in drafts %}
+  <article class="card draft">
+    <header>
+      <strong>{{ label(labels.DRAFT_KIND, d.kind) }}</strong>
+      <span class="pill">{{ label(labels.CHANNEL, d.channel) }}</span>
+      <span class="pill {% if d.status != 'pending' %}warn{% endif %}">{{ label(labels.DRAFT_STATUS, d.status) }}</span>
+      <span class="muted" style="font-size:13px">{{ "נכתבה ידנית" if d.generated_by == "human" else d.generated_by }}</span>
+    </header>
+    {% if d.subject %}<div class="subject" dir="auto"><span class="muted">נושא:</span> {{ d.subject }}</div>{% endif %}
+    <pre class="body" dir="auto">{{ d.body }}</pre>
+  </article>
+{% else %}
+  <p class="muted">אין טיוטות</p>
+{% endfor %}
+
+<h2>פרופיל</h2>
+{% if profile %}
+  {% set p = profile.data %}
+  <div class="card">
+    <dl class="facts">
+      {% if p.what_they_sell %}<dt>מה מוכרים</dt><dd>{{ p.what_they_sell }}</dd>{% endif %}
+      {% if p.audience %}<dt>קהל</dt><dd>{{ p.audience }}</dd>{% endif %}
+      {% if p.positioning %}<dt>מיצוב</dt><dd>{{ p.positioning }}</dd>{% endif %}
+      {% if p.ads %}<dt>מודעות</dt><dd>{{ p.ads }}</dd>{% endif %}
+      {% if p.package %}<dt>חבילה</dt><dd>{{ p.package }}</dd>{% endif %}
+      {% if p.roi is mapping and p.roi.one_liner %}<dt>החזר</dt><dd>{{ p.roi.one_liner }}{% if p.roi.confidence %} <span class="pill">ביטחון: {{ p.roi.confidence }}</span>{% endif %}</dd>{% endif %}
+    </dl>
+
+    {% if p.price_points is iterable and p.price_points is not string and p.price_points %}
+      <h2>מחירים</h2>
+      <table class="mini">
+        {% for pp in p.price_points %}{% if pp is mapping %}
+          <tr><td>{{ pp.item }}</td><td>{{ pp.price }}</td><td>{% if pp.url %}<a href="{{ pp.url }}" target="_blank" rel="noopener noreferrer">מקור</a>{% endif %}</td></tr>
+        {% endif %}{% endfor %}
+      </table>
+    {% endif %}
+
+    {% if p.opportunities is iterable and p.opportunities is not string and p.opportunities %}
+      <h2>הזדמנויות</h2>
+      <ul class="tight">{% for o in p.opportunities %}<li>{{ o if o is string else o|pretty }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if p.weaknesses is iterable and p.weaknesses is not string and p.weaknesses %}
+      <h2>נקודות לשיפור (פנימי)</h2>
+      <ul class="tight">
+        {% for w in p.weaknesses %}
+          <li>{% if w is mapping %}{{ w.point }}{% if w.confidence %} <span class="pill">{{ w.confidence }}</span>{% endif %}{% if w.source %} <a href="{{ w.source }}" target="_blank" rel="noopener noreferrer">מקור</a>{% endif %}{% else %}{{ w }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if p.recommended_services is iterable and p.recommended_services is not string and p.recommended_services %}
+      <h2>שירותים מומלצים</h2>
+      <ul class="tight">
+        {% for s in p.recommended_services %}
+          <li>{% if s is mapping %}<strong>{{ s.service }}</strong>: {{ s.what_exactly }}{% if s.why %} <span class="muted">({{ s.why }})</span>{% endif %}{% else %}{{ s }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if p.call_only_notes %}
+      <h2>בעל פה בלבד</h2>
+      <div class="callout">{{ p.call_only_notes }}<br><span class="muted" style="font-size:13px">לא נכנס לשום טיוטה כתובה.</span></div>
+    {% endif %}
+
+    {% if p.not_verified is iterable and p.not_verified is not string and p.not_verified %}
+      <h2>לא אומת</h2>
+      <ul class="tight">{% for n in p.not_verified %}<li>{{ n if n is string else n|pretty }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <details style="margin-top:12px"><summary class="muted">JSON מלא</summary><pre class="body ltr">{{ p|pretty }}</pre></details>
+  </div>
+{% else %}
+  <p class="muted">אין פרופיל עדיין</p>
+{% endif %}
+{% endblock %}

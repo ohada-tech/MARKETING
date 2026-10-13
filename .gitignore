@@ -1,0 +1,18 @@
+# secrets
+.env
+*.token
+token*.json
+credentials*.json
+
+# personal data: leads, imports, exports, the database
+data/*
+!data/.gitkeep
+*.db
+*.sqlite
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/

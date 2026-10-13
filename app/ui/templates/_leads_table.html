@@ -1,0 +1,32 @@
+<p class="muted">מוצגים {{ leads|length }} מתוך {{ total }} לידים</p>
+{% if leads %}
+<table class="leads">
+  <thead>
+    <tr>
+      <th>ציון</th><th>עסק</th><th>זווית</th><th>סטטוס</th><th>מסלול</th><th>טיוטות</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lead in leads %}
+    <tr>
+      <td class="score" data-label="ציון">{{ lead.score if lead.score is not none else "" }}</td>
+      <td>
+        <a href="/leads/{{ lead.id }}"><strong>{{ lead.company }}</strong></a>
+        <div class="muted">{{ label(labels.SEGMENT, lead.segment) }}{% if lead.city %} · {{ lead.city }}{% endif %}</div>
+      </td>
+      <td class="angle" data-label="זווית">{{ lead.angle or "" }}</td>
+      <td data-label="סטטוס">
+        <span class="pill {% if lead.status == 'suppressed' %}danger{% endif %}">{{ label(labels.STATUS, lead.status) }}</span>
+        {% if lead.id in profiled %}<span class="pill">פרופיל</span>{% endif %}
+      </td>
+      <td data-label="מסלול">{{ label(labels.LEGAL_ROUTE, lead.legal_route) }}</td>
+      <td data-label="טיוטות">{{ draft_counts.get(lead.id, 0) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card muted">
+  {% if total %}אין לידים שמתאימים לסינון.{% else %}עוד אין לידים. ייבוא: <code class="ltr">python -m app.cli import &lt;תיקייה או קובץ&gt;</code>{% endif %}
+</div>
+{% endif %}
